@@ -1,7 +1,5 @@
 package daos;
 
-import daos.AtmDao;
-import daos.AtmDaoImpl;
 import models.Atm;
 import models.Notes;
 import org.junit.Test;
@@ -43,10 +41,10 @@ public class AtmDaoSpec {
         Atm result = atmDao.remove(reducedNotes);
 
         assertEquals(expectedResult.getCash(), result.getCash());
-        assertEquals(result.getNotes().getTwenty(), expectedResult.getNotes().getTwenty());
-        assertEquals(result.getNotes().getFifty(), expectedResult.getNotes().getFifty());
-        assertEquals(result.getNotes().getHundred(), expectedResult.getNotes().getHundred());
-        assertEquals(result.getNotes().getFiveHundred(), expectedResult.getNotes().getFiveHundred());
-        assertEquals(result.getNotes().getThousand(), expectedResult.getNotes().getThousand());
+        assertEquals(expectedResult.getNotes().getTwenty(), result.getNotes().getTwenty());
+        assertEquals(expectedResult.getNotes().getFifty(), result.getNotes().getFifty());
+        assertEquals(expectedResult.getNotes().getHundred(), result.getNotes().getHundred());
+        assertEquals(expectedResult.getNotes().getFiveHundred(), result.getNotes().getFiveHundred());
+        assertEquals(expectedResult.getNotes().getThousand(), result.getNotes().getThousand());
     }
 }
