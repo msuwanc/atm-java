@@ -12,6 +12,8 @@ public class DatabaseConnection {
         return this.notes;
     }
 
+    public void setNotes(Notes notes) { this.notes = notes; }
+
     public Atm getAtm() {
         return this.atm;
     }

@@ -3,7 +3,7 @@ package utils;
 import java.util.function.Function;
 
 public class Validations {
-    public static Boolean isValidRequest(Long cash) {
+    public static Boolean isValidRequest(Long cash) throws CustomException {
         Function<Long[], Long> helper = notesList -> {
             Boolean flag = true;
             Long remaining = cash;
@@ -20,6 +20,10 @@ public class Validations {
         Long[] notesList = { Constants.TWENTY, Constants.FIFTY };
         Long[] notesList2 = { Constants.FIFTY, Constants.TWENTY };
 
-        return helper.apply(notesList) == 0 || helper.apply(notesList2) == 0;
+        if(cash > 0) {
+            return helper.apply(notesList) == 0 || helper.apply(notesList2) == 0;
+        } else {
+            throw new CustomException("Positive number without decimal only!");
+        }
     }
 }
