@@ -1,3 +1,5 @@
+package daos;
+
 import daos.AtmDao;
 import daos.AtmDaoImpl;
 import models.Atm;
