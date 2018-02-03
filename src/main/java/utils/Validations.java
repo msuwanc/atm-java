@@ -1,25 +1,25 @@
 package utils;
 
+import java.util.function.Function;
+
 public class Validations {
     public static Boolean isValidRequest(Long cash) {
-        Long remaining = cash;
+        Function<Long[], Long> helper = notesList -> {
+            Boolean flag = true;
+            Long remaining = cash;
 
-        Long[] notesList = {
-                Constants.THOUSAND,
-                Constants.FIVE_HUNDRED,
-                Constants.HUNDRED,
-                Constants.FIFTY,
-                Constants.TWENTY
+            for(int i = 0; i < 2 && flag; i++) {
+                remaining = remaining % notesList[i];
+
+                if(remaining == 0) flag = false;
+            }
+
+            return remaining;
         };
 
-        Boolean flag = true;
+        Long[] notesList = { Constants.TWENTY, Constants.FIFTY };
+        Long[] notesList2 = { Constants.FIFTY, Constants.TWENTY };
 
-        for(int i = 0; i < 5 && flag; i++) {
-            remaining = remaining % notesList[i];
-
-            if(remaining == 0) flag = false;
-        }
-
-        return remaining == 0;
+        return helper.apply(notesList) == 0 || helper.apply(notesList2) == 0;
     }
 }
