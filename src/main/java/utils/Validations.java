@@ -1,18 +1,25 @@
 package utils;
 
-import fj.data.Array;
-
-import static fj.data.Array.array;
-
 public class Validations {
     public static Boolean isValidRequest(Long cash) {
-        final Array<Long> listValidValue = array(
-            Constants.TWENTY,
-            Constants.FIFTY,
-            Constants.HUNDRED,
-            Constants.FIVE_HUNDRED,
-            Constants.THOUSAND);
+        Long remaining = cash;
 
-        return !listValidValue.forall(validValue -> (cash % validValue) != 0);
+        Long[] notesList = {
+                Constants.THOUSAND,
+                Constants.FIVE_HUNDRED,
+                Constants.HUNDRED,
+                Constants.FIFTY,
+                Constants.TWENTY
+        };
+
+        Boolean flag = true;
+
+        for(int i = 0; i < 5 && flag; i++) {
+            remaining = remaining % notesList[i];
+
+            if(remaining == 0) flag = false;
+        }
+
+        return remaining == 0;
     }
 }
