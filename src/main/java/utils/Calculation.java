@@ -1,8 +1,7 @@
 package utils;
 
+import models.Atm;
 import models.Notes;
-
-import java.util.function.Function;
 
 public class Calculation {
     public static Notes calculateNotes(Notes currentNotes, Notes reducedNotes) {
@@ -22,42 +21,74 @@ public class Calculation {
                 (notes.getThousand() * Constants.THOUSAND);
     }
 
-    public static java.util.Map.Entry<Long, Long> calculateNotesAndRemains(Long cashValue, Long noteType) {
-        Function<Long, java.util.Map.Entry<Long, Long>> calculateHelper = noteTypeValue -> {
-            if(cashValue > noteTypeValue) {
-                return new java.util.AbstractMap.SimpleEntry<Long, Long>(cashValue / noteTypeValue, cashValue % noteTypeValue);
-            } else {
-                return new java.util.AbstractMap.SimpleEntry<Long, Long>(0L, cashValue);
-            }
+    public static Notes calculateNotesFromCashBasedOnAtm(Long cash, Atm atm) throws CustomException {
+        Boolean flag = true;
+
+        Long[] notesValueList = {
+                Constants.THOUSAND,
+                Constants.FIVE_HUNDRED,
+                Constants.HUNDRED,
+                Constants.FIFTY,
+                Constants.TWENTY
         };
 
-        java.util.Map.Entry<Long, Long> result = new java.util.AbstractMap.SimpleEntry<Long, Long>(0L, cashValue);
+        Long[] notesInAtm = {
+                atm.getNotes().getThousand(),
+                atm.getNotes().getFiveHundred(),
+                atm.getNotes().getHundred(),
+                atm.getNotes().getFifty(),
+                atm.getNotes().getTwenty()
+        };
 
-        switch (noteType.intValue()) {
-            case 20: result = calculateHelper.apply(20L);
-                break;
-            case 50: result = calculateHelper.apply(50L);
-                break;
-            case 100: result = calculateHelper.apply(100L);
-                break;
-            case 500: result = calculateHelper.apply(500L);
-                break;
-            case 1000: result = calculateHelper.apply(1000L);
-                break;
-            default: result = result;
-                break;
+        Long remaining = cash;
+        Long[] newNotesList = { 0L, 0L, 0L, 0L, 0L };
+
+        for(int i = 0; i < notesValueList.length && flag; i++) {
+            // Handle twenty note problem when 50 round occur
+            // Ex. Wanted 60 but get 50 with remaining that make error occurred.
+            if(i == 3) {
+                if(remaining == 20 || remaining == 40 || remaining == 60 || remaining == 80) remaining = remaining;
+                else {
+                    newNotesList[i] = remaining / notesValueList[i];
+
+                    if(newNotesList[i] > notesInAtm[i]) {
+                        newNotesList[i] = notesInAtm[i];
+
+                        if(newNotesList[i] != 0) remaining = remaining - (newNotesList[i] * notesValueList[i]);
+                    } else {
+                        if(newNotesList[i] != 0) remaining = remaining - (newNotesList[i] * notesValueList[i]);
+                    }
+
+                    if(remaining == 0) flag = false;
+                }
+            } else {
+                newNotesList[i] = remaining / notesValueList[i];
+
+                if(newNotesList[i] > notesInAtm[i]) {
+                    newNotesList[i] = notesInAtm[i];
+
+                    if(newNotesList[i] != 0) remaining = remaining - (newNotesList[i] * notesValueList[i]);
+                } else {
+                    if(newNotesList[i] != 0) remaining = remaining - (newNotesList[i] * notesValueList[i]);
+                }
+
+                if(remaining == 0) flag = false;
+            }
         }
 
-        return result;
-    }
-
-    public static Notes calculateNotesFromCash(Long cash) {
-        java.util.Map.Entry<Long, Long> thousandNotesAndRemains = calculateNotesAndRemains(cash,1000L);
-        java.util.Map.Entry<Long, Long> fiveHundredNotesAndRemains = calculateNotesAndRemains(thousandNotesAndRemains.getValue(),500L);
-        java.util.Map.Entry<Long, Long> hundredNotesAndRemains = calculateNotesAndRemains(fiveHundredNotesAndRemains.getValue(),100L);
-        java.util.Map.Entry<Long, Long> fiftyNotesAndRemains = calculateNotesAndRemains(hundredNotesAndRemains.getValue(),50L);
-        java.util.Map.Entry<Long, Long> twentyNotesAndRemains = calculateNotesAndRemains(fiftyNotesAndRemains.getValue(),20L);
-
-        return new Notes(twentyNotesAndRemains.getKey(), fiftyNotesAndRemains.getKey(), hundredNotesAndRemains.getKey(), fiveHundredNotesAndRemains.getKey(), thousandNotesAndRemains.getKey());
+        if(remaining == 0) {
+            return new Notes(newNotesList[4], newNotesList[3], newNotesList[2], newNotesList[1], newNotesList[0]);
+        }
+        else {
+            if(cash > atm.getCash()) {
+                throw new CustomException("Currently, We've run out of cash(we only have " + atm.getCash() + "). Please come back later.");
+            } else if(remaining % 20 == 0) {
+                throw new CustomException("Currently, We've run out of twenty notes(we only have " + atm.getNotes().getTwenty() + "). Please come back later.");
+            } else if(remaining % 50 == 0) {
+                throw new CustomException("Currently, We've run out of fifty notes(we only have " + atm.getNotes().getFifty() + "). Please come back later.");
+            } else {
+                throw new CustomException("Currently, We've run out of cash(we only have " + atm.getCash() + "). Please come back later.");
+            }
+        }
     }
 }

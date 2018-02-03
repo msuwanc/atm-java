@@ -39,6 +39,10 @@ public class Main {
                         println(message);
                         println("Thank you.");
                         println("");
+                    } catch (CustomException e) {
+                        println(e.getMessage());
+
+                        flag = false;
                     } catch (Exception e) {
                         flag = false;
                     }
@@ -46,10 +50,8 @@ public class Main {
                     throw new CustomException("In an ATM with only 20, 50, 100, 500 and 1000 notes, it is not possible to dispense " + wantedCash);
                 }
             }
-        } catch (CustomException e){
-            println(e.getMessage());
         } catch (Exception e){
-            println("Positive number without decimal only!");
+            println(e.getMessage());
         }
     }
 }
